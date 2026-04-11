@@ -9,6 +9,25 @@ import json
 #    st.info("비밀번호를 입력해야 내역을 볼 수 있습니다.")
 #    st.stop() # 아래 코드를 실행하지 않음
 
+# 1. 코드 상단에 CSS 추가 (줄바꿈 방지)
+st.markdown("""
+    <style>
+    /* 컬럼 컨테이너의 줄바꿈을 강제로 막음 */
+    [data-testid="column"] {
+        min-width: 0px !important;
+        flex-basis: auto !important;
+    }
+    [data-testid="stHorizontalBlock"] {
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+    }
+    /* 버튼 주위의 불필요한 여백 제거 */
+    .stButton > button {
+        padding: 0px 5px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 st.set_page_config(page_title="우리집 영수증 보관함", layout="centered")
 
 # --- [1. 폴더 및 데이터 설정] ---
@@ -133,38 +152,29 @@ day_data = receipt_info.get(curr, [])
 if day_data:
     for idx, item in enumerate(day_data):
         view_key = f"view_state_{curr}_{idx}"
-        if view_key not in st.session_state:
-            st.session_state[view_key] = False
-
         with st.container(border=True):
-            # 1. 컬럼 비율을 모바일에 맞게 아주 타이트하게 조정 (7:1.5:1.5)
-            # gap="small"을 주어 간격을 최소화합니다.
-            col_info, col_view, col_del = st.columns([0.7, 0.15, 0.15], gap="small")
+            # 글자 비중을 더 키우고 버튼 비중을 최소화 (8:1:1 비율)
+            c1, c2, c3 = st.columns([0.8, 0.1, 0.1], gap="small")
             
-            with col_info:
-                # 체크박스 안에 상호명과 금액을 다 넣어서 높이를 줄입니다.
-                is_settled = item.get('settled', False)
-                label = f"**{item['store']}** ({item['price']}원)"
-                if st.checkbox(label, value=is_settled, key=f"check_{curr}_{idx}"):
-                    # 정산 상태 업데이트 로직 (생략 가능, 기존 로직 유지)
-                    pass
+            with c1:
+                st.checkbox(f"**{item['store']}** ({item['price']}원)", 
+                            value=item.get('settled', False), 
+                            key=f"check_{curr}_{idx}")
             
-            with col_view:
-                # 2. 버튼의 여백을 없애기 위해 아이콘만 사용
-                btn_label = "❌" if st.session_state[view_key] else "👁️"
+            with c2:
+                btn_label = "❌" if st.session_state.get(view_key, False) else "👁️"
                 if st.button(btn_label, key=f"btn_{view_key}"):
-                    st.session_state[view_key] = not st.session_state[view_key]
+                    st.session_state[view_key] = not st.session_state.get(view_key, False)
                     st.rerun()
             
-            with col_del:
-                # 3. 삭제 버튼도 아이콘으로 간결하게
+            with c3:
                 with st.popover("🗑️"):
                     if st.button("삭제", key=f"del_{idx}"):
-                        # 삭제 로직 실행
+                        # (삭제 로직...)
                         st.rerun()
 
-            # --- 사진 영역 ---
-            if st.session_state[view_key]:
+            # 사진 영역 (켜졌을 때만)
+            if st.session_state.get(view_key, False):
                 st.image(os.path.join(SAVE_DIR, curr, item['file_name']), use_container_width=True)
                 
 else:
