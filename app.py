@@ -62,6 +62,21 @@ if st.button("📍 오늘로 돌아가기"):
 
 # --- [4. 달력 설정 수정] ---
 # --- [4. 달력 설정 - 색상 강조 및 모바일 버전] ---
+# --- [4. 달력 설정 - 오류 방지 및 색상 강조 버전] ---
+
+# 1. 점 표시용 데이터 가져오기 (함수 호출)
+dot_events = get_event_list() 
+
+# 2. 선택된 날짜 강조용 데이터 생성 (연분홍색)
+selected_day_event = [
+    {
+        "start": st.session_state.selected_date,
+        "display": "background",
+        "color": "#FFD1DC"  # 연분홍색
+    }
+]
+
+# 3. 달력 옵션 설정
 calendar_options = {
     "headerToolbar": {
         "left": "prev,next", 
@@ -72,25 +87,21 @@ calendar_options = {
     "selectable": True,
     "initialDate": st.session_state.selected_date,
     "locale": "ko", 
-    
-    # 1. 요일 이름 한 글자로 (일, 월, 화...)
     "dayHeaderFormat": {"weekday": "narrow"}, 
     
-    # 2. 선택한 날짜 강조 (연분홍색) 및 점 표시 설정
-    # 점 표시(current_events)와 별도로, 현재 선택된 날짜에 배경색을 입힙니다.
-    "events": current_events + [
-        {
-            "start": st.session_state.selected_date,
-            "display": "background",
-            "color": "#FFD1DC"  # 연분홍색 (Pastel Pink)
-        }
-    ],
+    # 두 리스트를 합쳐서 달력에 표시 (점 데이터 + 분홍색 배경)
+    "events": dot_events + selected_day_event,
 
-    # 3. 모바일 화면 맞춤 (잘림 방지)
     "contentHeight": "auto", 
-    "aspectRatio": 1.1,      # 모바일 가로 폭에 따라 1.0 ~ 1.2 사이에서 조절하세요.
+    "aspectRatio": 1.1, 
     "expandRows": True,
 }
+
+# 달력 그리기 (기존 코드의 state = calendar(...) 부분)
+state = calendar(
+    options=calendar_options, 
+    key=f"cal_{st.session_state.calendar_key}"
+)
 
 current_events = get_event_list()
 state = calendar(options=calendar_options, events=current_events, key=f"cal_{st.session_state.calendar_key}")
