@@ -53,7 +53,7 @@ if "calendar_key" not in st.session_state:
 st.title("📂 영수증 보관함")
 
 # --- [3. 버튼 통일: 오늘로 돌아가기] ---
-if st.button("📍 오늘로 돌아가기",use_container_width=False):
+if st.button("📍Today",use_container_width=False):
     st.session_state.selected_date = today_str
     st.session_state.calendar_key += 1 # key를 바꿔서 달력을 새로 그리게 함
     st.rerun()
