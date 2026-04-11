@@ -9,44 +9,7 @@ import json
 #    st.info("비밀번호를 입력해야 내역을 볼 수 있습니다.")
 #    st.stop() # 아래 코드를 실행하지 않음
 
-# 1. 코드 상단에 CSS 추가 (줄바꿈 방지)
-st.markdown("""
-    <style>
-    /* 1. 가로 배치 강제 및 넘침 방지 */
-    [data-testid="stHorizontalBlock"] {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        width: 100% !important;
-    }
 
-    /* 2. 체크박스 글자 영역: 폭 제한 + 말줄임표 */
-    [data-testid="stCheckbox"] {
-        flex: 1 1 auto !important;
-        min-width: 0 !important; /* 중요: flex 안에서 말줄임표 작동 조건 */
-    }
-    
-    [data-testid="stCheckbox"] label p {
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
-        max-width: 160px !important; /* 폰 기종에 따라 150~180 조절 */
-    }
-
-    /* 3. 버튼 영역: 폭 고정 */
-    [data-testid="column"]:nth-child(2), 
-    [data-testid="column"]:nth-child(3) {
-        flex: 0 0 40px !important; /* 버튼 칸 폭을 40px로 딱 고정 */
-        min-width: 40px !important;
-    }
-
-    .stButton > button {
-        width: 100% !important;
-        padding: 0px !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 ####
 st.set_page_config(page_title="우리집 영수증 보관함", layout="centered")
 
@@ -169,31 +132,45 @@ receipt_info = load_info()
 day_data = receipt_info.get(curr, [])
 
 # --- [5. 하단 상세 내역 영역 - 강제 한 줄 배치] ---
+# --- [5. 하단 상세 내역 영역 수정] ---
+# (중략: 데이터 불러오기 로직)
+
 if day_data:
     for idx, item in enumerate(day_data):
+        # 1. 각 내역별로 '보여주기 상태'를 저장할 전용 키 생성
         view_key = f"view_state_{curr}_{idx}"
-        
-        with st.container(border=True):
-            # 컬럼 비율보다는 위 CSS의 nth-child 설정이 우선 적용됩니다.
-            c1, c2, c3 = st.columns([0.7, 0.15, 0.15])
-            
-            with c1:
-                label = f"{item['store']} ({item['price']})"
-                st.checkbox(label, value=item.get('settled', False), key=f"check_{curr}_{idx}")
-            
-            with c2:
-                v_icon = "❌" if st.session_state.get(view_key) else "👁️"
-                if st.button(v_icon, key=f"btn_{view_key}"):
-                    st.session_state[view_key] = not st.session_state.get(view_key, False)
-                    st.rerun()
-            
-            with c3:
-                if st.button("🗑️", key=f"del_{idx}"):
-                    # 삭제 로직은 기존대로 유지
-                    pass
+        if view_key not in st.session_state:
+            st.session_state[view_key] = False # 처음엔 닫힘 상태
 
-            if st.session_state.get(view_key):
-                st.image(os.path.join(SAVE_DIR, curr, item['file_name']), use_container_width=True)
+        with st.container(border=True):
+            col1, col2, col3 = st.columns([3, 1, 1])
+            
+            with col1:
+                # 정산 체크박스 등 기존 코드 유지
+                st.checkbox(f"**{item['store']}** ({item['price']}원)", value=item.get('settled', False), key=f"check_{curr}_{idx}")
+
+            with col2:
+                # 2. 버튼 텍스트를 상태에 따라 변경 (보기 -> 닫기)
+                btn_label = "❌ 닫기" if st.session_state[view_key] else ""
+                if st.button(btn_label, key=f"btn_{view_key}"):
+                    # 버튼을 누르면 상태를 반전(True <-> False)
+                    st.session_state[view_key] = not st.session_state[view_key]
+                    st.rerun()
+
+            with col3:
+                # 삭제 팝오버 등 기존 코드 유지
+                with st.popover("🗑️"):
+                    if st.button("삭제", key=f"del_{idx}"):
+                        # (삭제 로직)
+                        st.rerun()
+            
+            # 3. 상태가 True일 때만 사진 표시
+            if st.session_state[view_key]:
+                img_path = os.path.join(SAVE_DIR, curr, item['file_name'])
+                if os.path.exists(img_path):
+                    st.image(img_path, use_container_width=True)
+                    with open(img_path, "rb") as f:
+                        st.download_button("사진 저장", f, file_name=item['file_name'], key=f"down_{idx}")
                 
 else:
     st.info("등록된 내역이 없습니다.")
