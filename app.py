@@ -182,7 +182,7 @@ if day_data:
             if show_img:
                 img_path = os.path.join(SAVE_DIR, curr, item['file_name'])
                 st.image(img_path, use_container_width=True)
-                with open(img_path, "rb") as f:
+#                with open(img_path, "rb") as f:
 #                    st.download_button("사진 저장", f, file_name=item['file_name'], key=f"down_{idx}")
 
 else:
