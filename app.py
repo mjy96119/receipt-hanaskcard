@@ -59,39 +59,6 @@ if st.button("📍Today",use_container_width=False):
     st.rerun()
 
 # ---------------------------------------------------------
-# 바로 여기에 [3.5 연/월 직접 선택 영역] 코드를 넣습니다!
-# ---------------------------------------------------------
-# --- [3.5 연/월 직접 선택 영역 - 한 줄 배치] ---
-# 가로로 두 칸을 나눕니다. (비율을 1:1로 설정)
-cols = st.columns(2)
-
-with cols[0]:
-    this_year = date.today().year
-    year_list = list(range(this_year - 2, this_year + 3))
-    current_year = int(st.session_state.selected_date[:4])
-    if current_year not in year_list:
-        year_list.append(current_year)
-        year_list.sort()
-    
-    # label_visibility="collapsed"를 쓰면 제목(연도)이 숨겨져서 더 깔끔해집니다.
-    selected_year = st.selectbox("연도", year_list, 
-                                 index=year_list.index(current_year),
-                                 label_visibility="visible") 
-
-with cols[1]:
-    month_list = list(range(1, 13))
-    current_month = int(st.session_state.selected_date[5:7])
-    selected_month = st.selectbox("월", month_list, 
-                                  index=current_month - 1,
-                                  label_visibility="visible")
-
-# 날짜 변경 감지 및 페이지 새로고침 로직
-new_picker_date = f"{selected_year}-{selected_month:02d}-01"
-if st.session_state.selected_date[:7] != new_picker_date[:7]:
-    st.session_state.selected_date = new_picker_date
-    st.session_state.calendar_key += 1
-    st.rerun()
-# ---------------------------------------------------------
 
 # --- [4. 달력 설정] ---
 
