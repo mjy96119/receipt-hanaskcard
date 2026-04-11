@@ -61,6 +61,7 @@ if st.button("📍 오늘로 돌아가기"):
 # --- [4. 달력 설정] ---
 
 # --- [4. 달력 설정 수정] ---
+# --- [4. 달력 설정 - 모바일 초밀착 버전] ---
 calendar_options = {
     "headerToolbar": {
         "left": "prev,next", 
@@ -71,11 +72,19 @@ calendar_options = {
     "selectable": True,
     "initialDate": st.session_state.selected_date,
     
-    # --- 모바일 최적화 핵심 옵션 ---
-    "contentHeight": "auto",      # 내용물 높이에 맞게 달력 높이 자동 조절 (스크롤 방지)
-    "aspectRatio": 0.85,          # 가로 대비 세로 비율 (숫자가 작을수록 세로로 길어짐, 모바일 권장 0.8~1.0)
-    "handleWindowResize": True,   # 화면 크기 조절 시 자동으로 다시 그리기
-    "locale": "ko",               # 한국어 설정 (월, 요일 등이 한글로 나옵니다)
+    # 1. '일' 글자 제거 및 날짜 숫자만 표시
+    "dayCellContent": {"html": "<b>{dayNumberText}</b>"},
+    "dayNumberFormat": {"day": "numeric"}, 
+    "locale": "ko", 
+    
+    # 2. 가로 폭에 맞춰 크기 강제 고정 (잘림 방지)
+    "contentHeight": "auto",       # 높이를 내용물에 맞춤
+    "aspectRatio": 1.2,            # 가로 대비 세로 비율 (숫자를 높여서 가로 폭에 밀착)
+    "expandRows": True,            # 행을 꽉 채움
+    "stickyHeaderDates": True,
+    
+    # 3. 모바일 가독성 (요일 이름 한 글자로)
+    "dayHeaderFormat": {"weekday": "narrow"}, # '월요일' -> '월'
 }
 
 current_events = get_event_list()
