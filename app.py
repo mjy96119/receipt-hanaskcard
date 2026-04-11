@@ -63,26 +63,12 @@ if st.button("📍 오늘로 돌아가기"):
 # --- [4. 달력 설정 수정] ---
 # --- [4. 달력 설정 - 깔끔한 모바일 버전] ---
 calendar_options = {
-    "headerToolbar": {
-        "left": "prev,next", 
-        "center": "title", 
-        "right": ""
-    },
+    "headerToolbar": {"left": "prev,next", "center": "title", "right": ""}, # today 버튼 제거 (통합)
     "initialView": "dayGridMonth",
     "selectable": True,
-    "initialDate": st.session_state.selected_date,
-    "locale": "ko", 
-    
-    # 1. '일' 글자 제거 (가장 표준적인 방법)
-    "dayHeaderFormat": {"weekday": "narrow"}, # 월, 화, 수... 한 글자로
-    
-    # 2. 높이와 비율 조정 (스크롤 없이 화면 가로에 딱 맞춤)
-    "contentHeight": "auto",       # 높이 자동
-    "aspectRatio": 1.0,            # 1.0~1.2 사이에서 조절 (숫자가 클수록 가로로 넓어짐)
-    "expandRows": True,            
-    
-    # 3. 추가적인 텍스트 정리 (불필요한 설정 삭제)
+    "initialDate": st.session_state.selected_date, # 현재 선택된 날짜가 달력의 중심
 }
+
 
 current_events = get_event_list()
 state = calendar(options=calendar_options, events=current_events, key=f"cal_{st.session_state.calendar_key}")
