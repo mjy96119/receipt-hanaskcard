@@ -12,33 +12,22 @@ import json
 # 1. 코드 상단에 CSS 추가 (줄바꿈 방지)
 st.markdown("""
     <style>
-    /* 전체 컨테이너 폭 고정 */
-    [data-testid="stHorizontalBlock"] {
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        width: 100% !important;
-        gap: 5px !important; /* 요소 간 간격 축소 */
+    /* 박스 내부 요소를 가로로 강제 정렬 */
+    .receipt-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 5px;
     }
-    
-    /* 체크박스 텍스트 영역 폭 제한 및 말줄임 */
-    [data-testid="stCheckbox"] label {
-        max-width: 180px; /* 모바일 폭에 맞게 글자 영역 제한 */
+    /* 체크박스 영역이 최대한 넓게 차지하도록 함 */
+    .stCheckbox {
+        flex-grow: 1;
         overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
     }
-
-    /* 버튼 크기 및 여백 최소화 */
-    .stButton > button {
-        width: 35px !important;
-        padding: 0px !important;
-        font-size: 16px !important;
-    }
-    
-    /* 팝오버 버튼 크기 조절 */
-    [data-testid="stPopover"] > button {
-        width: 35px !important;
-        padding: 0px !important;
+    /* 버튼 크기 최적화 */
+    .stButton button {
+        padding: 2px 8px !important;
+        height: auto !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -169,28 +158,38 @@ day_data = receipt_info.get(curr, [])
 if day_data:
     for idx, item in enumerate(day_data):
         view_key = f"view_state_{curr}_{idx}"
+        
         with st.container(border=True):
-            # 글자:보기:삭제 비율을 6:2:2 정도로 더 여유있게 나눔
-            c1, c2, c3 = st.columns([0.6, 0.2, 0.2])
+            # --- [핵심] 가로 정렬을 위한 div 시작 ---
+            st.markdown('<div class="receipt-row">', unsafe_allow_html=True)
             
-            with c1:
-                # 상호명이 너무 길면 뒤가 잘리더라도 한 줄 유지
-                label = f"**{item['store']}** ({item['price']})"
-                st.checkbox(label, value=item.get('settled', False), key=f"check_{curr}_{idx}")
+            # 왼쪽: 체크박스 (상호명/금액)
+            is_settled = item.get('settled', False)
+            # 글자가 너무 길면 자동으로 잘리도록 라벨 구성
+            label = f"{item['store']} ({item['price']})"
+            if st.checkbox(label, value=is_settled, key=f"check_{curr}_{idx}"):
+                # 정산 로직이 필요하면 여기에 추가
+                pass
             
-            with c2:
+            # 오른쪽 버튼들 (보기, 삭제)
+            # Streamlit 버튼은 HTML div 안에 직접 넣기 어려우므로 
+            # 버튼들만 묶어서 우측에 배치하도록 columns를 아주 작게 씁니다.
+            c_btns = st.columns([0.2, 0.2])
+            with c_btns[0]:
                 btn_label = "❌" if st.session_state.get(view_key) else "👁️"
                 if st.button(btn_label, key=f"btn_{view_key}"):
                     st.session_state[view_key] = not st.session_state.get(view_key)
                     st.rerun()
-            
-            with c3:
-                # 팝오버 내부 버튼도 간결하게
+            with c_btns[1]:
                 with st.popover("🗑️"):
                     if st.button("삭제", key=f"del_{idx}"):
-                        # (삭제 로직 생략)
+                        # 삭제 로직...
                         st.rerun()
+            
+            st.markdown('</div>', unsafe_allow_html=True)
+            # --- 가로 정렬 div 끝 ---
 
+            # 사진 영역 (켜졌을 때만)
             if st.session_state.get(view_key):
                 st.image(os.path.join(SAVE_DIR, curr, item['file_name']), use_container_width=True)
                 
