@@ -60,23 +60,19 @@ if st.button("📍 오늘로 돌아가기"):
 
 # --- [4. 달력 설정] ---
 
-# --- [4. 달력 설정 수정] ---
-# --- [4. 달력 설정 - 색상 강조 및 모바일 버전] ---
-# --- [4. 달력 설정 - 오류 방지 및 색상 강조 버전] ---
+# --- [4. 달력 설정 및 그리기 (중복 제거 버전)] ---
 
-# 1. 점 표시용 데이터 가져오기 (함수 호출)
-dot_events = get_event_list() 
-
-# 2. 선택된 날짜 강조용 데이터 생성 (연분홍색)
+# 1. 모든 이벤트 데이터 준비
+dot_events = get_event_list() # 파일이 있는 날 점 표시
 selected_day_event = [
     {
         "start": st.session_state.selected_date,
         "display": "background",
-        "color": "#FFD1DC"  # 연분홍색
+        "color": "#FFD1DC"  # 연분홍색 강조
     }
 ]
 
-# 3. 달력 옵션 설정
+# 2. 옵션 통합
 calendar_options = {
     "headerToolbar": {
         "left": "prev,next", 
@@ -88,23 +84,18 @@ calendar_options = {
     "initialDate": st.session_state.selected_date,
     "locale": "ko", 
     "dayHeaderFormat": {"weekday": "narrow"}, 
-    
-    # 두 리스트를 합쳐서 달력에 표시 (점 데이터 + 분홍색 배경)
-    "events": dot_events + selected_day_event,
-
     "contentHeight": "auto", 
     "aspectRatio": 1.1, 
     "expandRows": True,
 }
 
-# 달력 그리기 (기존 코드의 state = calendar(...) 부분)
+# 3. 달력 그리기 (딱 한 번만 실행!)
+# events 파라미터에 두 데이터를 합쳐서 넣습니다.
 state = calendar(
     options=calendar_options, 
-    key=f"cal_{st.session_state.calendar_key}"
+    events=dot_events + selected_day_event,
+    key=f"cal_main_{st.session_state.calendar_key}" 
 )
-
-current_events = get_event_list()
-state = calendar(options=calendar_options, events=current_events, key=f"cal_{st.session_state.calendar_key}")
 
 # 날짜 클릭 처리 (9시간 보정 포함)
 if state.get("callback") == "dateClick":
