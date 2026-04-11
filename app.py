@@ -80,7 +80,7 @@ calendar_options = {
         "right": ""
     },
     "initialView": "dayGridMonth",
-    "locale": "ko",
+    "locale": "en",#"ko",
     
     # --- 크기 조절 핵심 ---
     "aspectRatio": 1.3,      # 숫자를 높여서 위아래 폭을 줄임
