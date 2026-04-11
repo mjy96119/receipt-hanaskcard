@@ -183,7 +183,7 @@ if day_data:
                 img_path = os.path.join(SAVE_DIR, curr, item['file_name'])
                 st.image(img_path, use_container_width=True)
                 with open(img_path, "rb") as f:
-                    st.download_button("사진 저장", f, file_name=item['file_name'], key=f"down_{idx}")
+#                    st.download_button("사진 저장", f, file_name=item['file_name'], key=f"down_{idx}")
 
 else:
     st.info("등록된 내역이 없습니다.")
