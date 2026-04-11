@@ -83,7 +83,7 @@ calendar_options = {
     "locale": "ko",
     
     # --- 크기 조절 핵심 ---
-    "aspectRatio": 1.4,      # 숫자를 높여서 위아래 폭을 줄임
+    "aspectRatio": 2.0,      # 숫자를 높여서 위아래 폭을 줄임
     "contentHeight": "auto", # 높이는 내용에 맞게 자동
     "handleWindowResize": True,
     
