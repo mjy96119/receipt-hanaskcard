@@ -12,22 +12,39 @@ import json
 # 1. 코드 상단에 CSS 추가 (줄바꿈 방지)
 st.markdown("""
     <style>
-    /* 컬럼 컨테이너의 줄바꿈을 강제로 막음 */
-    [data-testid="column"] {
-        min-width: 0px !important;
-        flex-basis: auto !important;
-    }
+    /* 전체 컨테이너 폭 고정 */
     [data-testid="stHorizontalBlock"] {
         flex-wrap: nowrap !important;
         align-items: center !important;
+        width: 100% !important;
+        gap: 5px !important; /* 요소 간 간격 축소 */
     }
-    /* 버튼 주위의 불필요한 여백 제거 */
+    
+    /* 체크박스 텍스트 영역 폭 제한 및 말줄임 */
+    [data-testid="stCheckbox"] label {
+        max-width: 180px; /* 모바일 폭에 맞게 글자 영역 제한 */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* 버튼 크기 및 여백 최소화 */
     .stButton > button {
-        padding: 0px 5px !important;
+        width: 35px !important;
+        padding: 0px !important;
+        font-size: 16px !important;
+    }
+    
+    /* 팝오버 버튼 크기 조절 */
+    [data-testid="stPopover"] > button {
+        width: 35px !important;
+        padding: 0px !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
+
+####
 st.set_page_config(page_title="우리집 영수증 보관함", layout="centered")
 
 # --- [1. 폴더 및 데이터 설정] ---
@@ -153,28 +170,28 @@ if day_data:
     for idx, item in enumerate(day_data):
         view_key = f"view_state_{curr}_{idx}"
         with st.container(border=True):
-            # 글자 비중을 더 키우고 버튼 비중을 최소화 (8:1:1 비율)
-            c1, c2, c3 = st.columns([0.8, 0.1, 0.1], gap="small")
+            # 글자:보기:삭제 비율을 6:2:2 정도로 더 여유있게 나눔
+            c1, c2, c3 = st.columns([0.6, 0.2, 0.2])
             
             with c1:
-                st.checkbox(f"**{item['store']}** ({item['price']}원)", 
-                            value=item.get('settled', False), 
-                            key=f"check_{curr}_{idx}")
+                # 상호명이 너무 길면 뒤가 잘리더라도 한 줄 유지
+                label = f"**{item['store']}** ({item['price']})"
+                st.checkbox(label, value=item.get('settled', False), key=f"check_{curr}_{idx}")
             
             with c2:
-                btn_label = "❌" if st.session_state.get(view_key, False) else "👁️"
+                btn_label = "❌" if st.session_state.get(view_key) else "👁️"
                 if st.button(btn_label, key=f"btn_{view_key}"):
-                    st.session_state[view_key] = not st.session_state.get(view_key, False)
+                    st.session_state[view_key] = not st.session_state.get(view_key)
                     st.rerun()
             
             with c3:
+                # 팝오버 내부 버튼도 간결하게
                 with st.popover("🗑️"):
                     if st.button("삭제", key=f"del_{idx}"):
-                        # (삭제 로직...)
+                        # (삭제 로직 생략)
                         st.rerun()
 
-            # 사진 영역 (켜졌을 때만)
-            if st.session_state.get(view_key, False):
+            if st.session_state.get(view_key):
                 st.image(os.path.join(SAVE_DIR, curr, item['file_name']), use_container_width=True)
                 
 else:
