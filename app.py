@@ -53,7 +53,7 @@ if "calendar_key" not in st.session_state:
 st.title("📂 영수증 보관함")
 
 # --- [3. 버튼 통일: 오늘로 돌아가기] ---
-if st.button("📍 오늘로 돌아가기"):
+if st.button("📍 오늘로 돌아가기",use_container_width=False):
     st.session_state.selected_date = today_str
     st.session_state.calendar_key += 1 # key를 바꿔서 달력을 새로 그리게 함
     st.rerun()
@@ -84,7 +84,7 @@ calendar_options = {
     
     # --- 크기 조절 핵심 ---
     "aspectRatio": 1.3,      # 숫자를 높여서 위아래 폭을 줄임
-    "contentHeight": 300, #"auto", # 높이는 내용에 맞게 자동
+    "contentHeight": 350, #"auto", # 높이는 내용에 맞게 자동
     "handleWindowResize": True,
     
     # 날짜 숫자 크기가 너무 크면 줄여서 더 작게 보이게 할 수도 있습니다.
