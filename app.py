@@ -39,7 +39,7 @@ def get_event_list():
     for date_key in receipt_info.keys():
         if receipt_info[date_key]: # 내역이 비어있지 않으면
             event_list.append({
-                "title": "•", 
+                "title": "🔴", 
                 "start": date_key, 
                 "display": "background", 
                 "color": "#ff4b4b"
