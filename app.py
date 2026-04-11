@@ -58,6 +58,33 @@ if st.button("📍Today",use_container_width=False):
     st.session_state.calendar_key += 1 # key를 바꿔서 달력을 새로 그리게 함
     st.rerun()
 
+# ---------------------------------------------------------
+# 바로 여기에 [3.5 연/월 직접 선택 영역] 코드를 넣습니다!
+# ---------------------------------------------------------
+col1, col2 = st.columns(2)
+with col1:
+    this_year = date.today().year
+    year_list = list(range(this_year - 2, this_year + 3)) # 최근 5년 정도
+    current_year = int(st.session_state.selected_date[:4])
+    # 만약 현재 연도가 리스트에 없으면 추가해주는 안전장치
+    if current_year not in year_list:
+        year_list.append(current_year)
+        year_list.sort()
+    selected_year = st.selectbox("연도", year_list, index=year_list.index(current_year))
+
+with col2:
+    month_list = list(range(1, 13))
+    current_month = int(st.session_state.selected_date[5:7])
+    selected_month = st.selectbox("월", month_list, index=current_month - 1)
+
+# 선택 값이 바뀌면 세션 상태 업데이트 (여기서 달력을 점프시킵니다)
+new_picker_date = f"{selected_year}-{selected_month:02d}-01"
+if st.session_state.selected_date[:7] != new_picker_date[:7]:
+    st.session_state.selected_date = new_picker_date
+    st.session_state.calendar_key += 1
+    st.rerun()
+# ---------------------------------------------------------
+
 # --- [4. 달력 설정] ---
 
 # --- [4. 달력 설정 및 그리기 (중복 제거 버전)] ---
