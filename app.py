@@ -12,26 +12,35 @@ import json
 # 1. 코드 상단에 CSS 추가 (줄바꿈 방지)
 st.markdown("""
     <style>
-    /* 박스 내부 요소를 가로로 강제 정렬 */
-    .receipt-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 5px;
+    /* 박스 자체를 버튼의 기준점으로 만듦 */
+    [data-testid="stVerticalBlockBorderWrapper"] > div > div {
+        position: relative !important;
     }
-    /* 체크박스 영역이 최대한 넓게 차지하도록 함 */
-    .stCheckbox {
-        flex-grow: 1;
-        overflow: hidden;
+
+    /* 보기 버튼 (👁️) 위치 고정 */
+    .view-btn-container {
+        position: absolute;
+        right: 55px;
+        top: 15px;
+        z-index: 999;
     }
-    /* 버튼 크기 최적화 */
+
+    /* 삭제 버튼 (🗑️) 위치 고정 */
+    .del-btn-container {
+        position: absolute;
+        right: 10px;
+        top: 15px;
+        z-index: 999;
+    }
+
+    /* 버튼 스타일 다듬기 */
     .stButton button {
-        padding: 2px 8px !important;
-        height: auto !important;
+        padding: 2px 5px !important;
+        border-radius: 5px !important;
+        background-color: transparent !important;
     }
     </style>
     """, unsafe_allow_html=True)
-
 
 ####
 st.set_page_config(page_title="우리집 영수증 보관함", layout="centered")
@@ -160,37 +169,33 @@ if day_data:
         view_key = f"view_state_{curr}_{idx}"
         
         with st.container(border=True):
-            # --- [핵심] 가로 정렬을 위한 div 시작 ---
-            st.markdown('<div class="receipt-row">', unsafe_allow_html=True)
-            
-            # 왼쪽: 체크박스 (상호명/금액)
+            # 왼쪽: 체크박스만 평범하게 넣음 (버튼 자리를 위해 오른쪽 여백 확보)
             is_settled = item.get('settled', False)
-            # 글자가 너무 길면 자동으로 잘리도록 라벨 구성
-            label = f"{item['store']} ({item['price']})"
-            if st.checkbox(label, value=is_settled, key=f"check_{curr}_{idx}"):
-                # 정산 로직이 필요하면 여기에 추가
-                pass
-            
-            # 오른쪽 버튼들 (보기, 삭제)
-            # Streamlit 버튼은 HTML div 안에 직접 넣기 어려우므로 
-            # 버튼들만 묶어서 우측에 배치하도록 columns를 아주 작게 씁니다.
-            c_btns = st.columns([0.2, 0.2])
-            with c_btns[0]:
-                btn_label = "❌" if st.session_state.get(view_key) else "👁️"
-                if st.button(btn_label, key=f"btn_{view_key}"):
-                    st.session_state[view_key] = not st.session_state.get(view_key)
-                    st.rerun()
-            with c_btns[1]:
-                with st.popover("🗑️"):
-                    if st.button("삭제", key=f"del_{idx}"):
-                        # 삭제 로직...
-                        st.rerun()
-            
-            st.markdown('</div>', unsafe_allow_html=True)
-            # --- 가로 정렬 div 끝 ---
+            label = f"**{item['store']}** \n({item['price']}원)"
+            st.checkbox(label, value=is_settled, key=f"check_{curr}_{idx}")
 
-            # 사진 영역 (켜졌을 때만)
+            # 오른쪽 구석: 버튼들을 절대 위치 커스텀 컨테이너에 넣음
+            # 보기 버튼
+            st.markdown(f'<div class="view-btn-container">', unsafe_allow_html=True)
+            btn_label = "❌" if st.session_state.get(view_key) else "👁️"
+            if st.button(btn_label, key=f"btn_{view_key}"):
+                st.session_state[view_key] = not st.session_state.get(view_key)
+                st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            # 삭제 버튼 (팝오버 대신 바로 버튼으로 변경하여 공간 확보)
+            st.markdown(f'<div class="del-btn-container">', unsafe_allow_html=True)
+            # 모바일에서 팝오버는 자리를 너무 많이 차지하니, 바로 삭제 버튼으로!
+            if st.button("🗑️", key=f"del_btn_{idx}"):
+                # 삭제 확인은 브라우저 기본 경고창으로 대체 (이게 모바일에서 제일 확실함)
+                # 여기서는 삭제 로직만 실행하도록 구성
+                st.session_state[f"confirm_del_{idx}"] = True
+                st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            # 사진 영역
             if st.session_state.get(view_key):
+                st.divider()
                 st.image(os.path.join(SAVE_DIR, curr, item['file_name']), use_container_width=True)
                 
 else:
