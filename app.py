@@ -61,7 +61,7 @@ if st.button("📍 오늘로 돌아가기"):
 # --- [4. 달력 설정] ---
 
 # --- [4. 달력 설정 수정] ---
-# --- [4. 달력 설정 - 모바일 초밀착 버전] ---
+# --- [4. 달력 설정 - 깔끔한 모바일 버전] ---
 calendar_options = {
     "headerToolbar": {
         "left": "prev,next", 
@@ -71,20 +71,17 @@ calendar_options = {
     "initialView": "dayGridMonth",
     "selectable": True,
     "initialDate": st.session_state.selected_date,
-    
-    # 1. '일' 글자 제거 및 날짜 숫자만 표시
-    "dayCellContent": {"html": "<b>{dayNumberText}</b>"},
-    "dayNumberFormat": {"day": "numeric"}, 
     "locale": "ko", 
     
-    # 2. 가로 폭에 맞춰 크기 강제 고정 (잘림 방지)
-    "contentHeight": "auto",       # 높이를 내용물에 맞춤
-    "aspectRatio": 1.2,            # 가로 대비 세로 비율 (숫자를 높여서 가로 폭에 밀착)
-    "expandRows": True,            # 행을 꽉 채움
-    "stickyHeaderDates": True,
+    # 1. '일' 글자 제거 (가장 표준적인 방법)
+    "dayHeaderFormat": {"weekday": "narrow"}, # 월, 화, 수... 한 글자로
     
-    # 3. 모바일 가독성 (요일 이름 한 글자로)
-    "dayHeaderFormat": {"weekday": "narrow"}, # '월요일' -> '월'
+    # 2. 높이와 비율 조정 (스크롤 없이 화면 가로에 딱 맞춤)
+    "contentHeight": "auto",       # 높이 자동
+    "aspectRatio": 1.0,            # 1.0~1.2 사이에서 조절 (숫자가 클수록 가로로 넓어짐)
+    "expandRows": True,            
+    
+    # 3. 추가적인 텍스트 정리 (불필요한 설정 삭제)
 }
 
 current_events = get_event_list()
