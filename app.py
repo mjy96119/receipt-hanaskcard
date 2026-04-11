@@ -59,11 +59,23 @@ if st.button("📍 오늘로 돌아가기"):
     st.rerun()
 
 # --- [4. 달력 설정] ---
+
+# --- [4. 달력 설정 수정] ---
 calendar_options = {
-    "headerToolbar": {"left": "prev,next", "center": "title", "right": ""}, # today 버튼 제거 (통합)
+    "headerToolbar": {
+        "left": "prev,next", 
+        "center": "title", 
+        "right": ""
+    },
     "initialView": "dayGridMonth",
     "selectable": True,
-    "initialDate": st.session_state.selected_date, # 현재 선택된 날짜가 달력의 중심
+    "initialDate": st.session_state.selected_date,
+    
+    # --- 모바일 최적화 핵심 옵션 ---
+    "contentHeight": "auto",      # 내용물 높이에 맞게 달력 높이 자동 조절 (스크롤 방지)
+    "aspectRatio": 0.85,          # 가로 대비 세로 비율 (숫자가 작을수록 세로로 길어짐, 모바일 권장 0.8~1.0)
+    "handleWindowResize": True,   # 화면 크기 조절 시 자동으로 다시 그리기
+    "locale": "ko",               # 한국어 설정 (월, 요일 등이 한글로 나옵니다)
 }
 
 current_events = get_event_list()
@@ -81,6 +93,9 @@ if state.get("callback") == "dateClick":
         if st.session_state.selected_date != new_date:
             st.session_state.selected_date = new_date
             st.rerun()
+
+
+
 # --- [5. 하단 상세 내역 영역] ---
 curr = st.session_state.selected_date
 st.divider()
