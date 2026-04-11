@@ -151,7 +151,7 @@ if day_data:
 
             with col2:
                 # 2. 버튼 텍스트를 상태에 따라 변경 (보기 -> 닫기)
-                btn_label = "❌ 닫기" if st.session_state[view_key] else ""
+                btn_label = "❌" if st.session_state[view_key] else "📷"
                 if st.button(btn_label, key=f"btn_{view_key}"):
                     # 버튼을 누르면 상태를 반전(True <-> False)
                     st.session_state[view_key] = not st.session_state[view_key]
