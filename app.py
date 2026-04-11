@@ -159,14 +159,7 @@ if day_data:
 
             with col2:
                 # 파일 보기 (Expander)
-#                show_img = st.button("👁️ 보기", key=f"view_{idx}")
-# 2. 버튼 텍스트를 상태에 따라 변경 (보기 -> 닫기)
-                btn_label = "❌ 닫기" if st.session_state[view_key] else "👁️ 보기"
-                if st.button(btn_label, key=f"btn_{view_key}"):
-                    # 버튼을 누르면 상태를 반전(True <-> False)
-                    st.session_state[view_key] = not st.session_state[view_key]
-                    st.rerun()
-            
+                show_img = st.button("📷", key=f"view_{idx}")            
 
             with col3:
                 # 2. 삭제 확인 로직 (Popover 활용)
