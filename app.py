@@ -131,41 +131,37 @@ day_data = receipt_info.get(curr, [])
 
 if day_data:
     for idx, item in enumerate(day_data):
-        # 1. 각 내역별로 '보여주기 상태'를 저장할 전용 키 생성
         view_key = f"view_state_{curr}_{idx}"
         if view_key not in st.session_state:
-            st.session_state[view_key] = False # 처음엔 닫힘 상태
+            st.session_state[view_key] = False
 
+        # --- 한 내역을 하나의 컨테이너로 묶음 ---
         with st.container(border=True):
-            col1, col2, col3 = st.columns([3, 1, 1])
+            # 글자와 버튼들의 가로 비율을 조정 (글자:보기:삭제 = 6:2:2)
+            col_text, col_view, col_del = st.columns([0.6, 0.2, 0.2])
             
-            with col1:
-                # 정산 체크박스 등 기존 코드 유지
-                st.checkbox(f"**{item['store']}** ({item['price']}원)", value=item.get('settled', False), key=f"check_{curr}_{idx}")
-
-            with col2:
-                # 2. 버튼 텍스트를 상태에 따라 변경 (보기 -> 닫기)
-                btn_label = "❌ 닫기" if st.session_state[view_key] else "👁️ 보기"
-                if st.button(btn_label, key=f"btn_{view_key}"):
-                    # 버튼을 누르면 상태를 반전(True <-> False)
+            with col_text:
+                # 상호명과 금액을 한 줄에 표시
+                st.markdown(f"**{item['store']}** \n{item['price']}원")
+            
+            with col_view:
+                btn_label = "❌" if st.session_state[view_key] else "👁️"
+                if st.button(btn_label, key=f"btn_{view_key}", use_container_width=True):
                     st.session_state[view_key] = not st.session_state[view_key]
                     st.rerun()
-
-            with col3:
-                # 삭제 팝오버 등 기존 코드 유지
+            
+            with col_del:
                 with st.popover("🗑️"):
-                    if st.button("삭제", key=f"del_{idx}"):
+                    if st.button("삭제", key=f"del_{idx}", use_container_width=True):
                         # (삭제 로직)
                         st.rerun()
-            
-            # 3. 상태가 True일 때만 사진 표시
-            if st.session_state[view_key]:
-                img_path = os.path.join(SAVE_DIR, curr, item['file_name'])
-                if os.path.exists(img_path):
-                    st.image(img_path, use_container_width=True)
-                    with open(img_path, "rb") as f:
-                        st.download_button("사진 저장", f, file_name=item['file_name'], key=f"down_{idx}")
 
+            # --- 사진이 열릴 때 ---
+            if st.session_state[view_key]:
+                st.divider()
+                img_path = os.path.join(SAVE_DIR, curr, item['file_name'])
+                st.image(img_path, use_container_width=True)
+                
 else:
     st.info("등록된 내역이 없습니다.")
 # --- [6. 업로드 영역: 상호명/금액 입력 포함] ---
