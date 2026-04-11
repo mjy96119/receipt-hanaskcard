@@ -4,6 +4,11 @@ from datetime import datetime, timedelta, date
 import os
 import json
 
+password = st.sidebar.text_input("비밀번호를 입력하세요", type="password")
+if password != "0000": # 여기에 사용할 암호를 적으세요
+    st.info("비밀번호를 입력해야 내역을 볼 수 있습니다.")
+    st.stop() # 아래 코드를 실행하지 않음
+
 st.set_page_config(page_title="우리집 영수증 보관함", layout="centered")
 
 # --- [1. 폴더 및 데이터 설정] ---
