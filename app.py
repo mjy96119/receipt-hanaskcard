@@ -61,14 +61,36 @@ if st.button("📍 오늘로 돌아가기"):
 # --- [4. 달력 설정] ---
 
 # --- [4. 달력 설정 수정] ---
-# --- [4. 달력 설정 - 깔끔한 모바일 버전] ---
+# --- [4. 달력 설정 - 색상 강조 및 모바일 버전] ---
 calendar_options = {
-    "headerToolbar": {"left": "prev,next", "center": "title", "right": ""}, # today 버튼 제거 (통합)
+    "headerToolbar": {
+        "left": "prev,next", 
+        "center": "title", 
+        "right": ""
+    },
     "initialView": "dayGridMonth",
     "selectable": True,
-    "initialDate": st.session_state.selected_date, # 현재 선택된 날짜가 달력의 중심
-}
+    "initialDate": st.session_state.selected_date,
+    "locale": "ko", 
+    
+    # 1. 요일 이름 한 글자로 (일, 월, 화...)
+    "dayHeaderFormat": {"weekday": "narrow"}, 
+    
+    # 2. 선택한 날짜 강조 (연분홍색) 및 점 표시 설정
+    # 점 표시(current_events)와 별도로, 현재 선택된 날짜에 배경색을 입힙니다.
+    "events": current_events + [
+        {
+            "start": st.session_state.selected_date,
+            "display": "background",
+            "color": "#FFD1DC"  # 연분홍색 (Pastel Pink)
+        }
+    ],
 
+    # 3. 모바일 화면 맞춤 (잘림 방지)
+    "contentHeight": "auto", 
+    "aspectRatio": 1.1,      # 모바일 가로 폭에 따라 1.0 ~ 1.2 사이에서 조절하세요.
+    "expandRows": True,
+}
 
 current_events = get_event_list()
 state = calendar(options=calendar_options, events=current_events, key=f"cal_{st.session_state.calendar_key}")
