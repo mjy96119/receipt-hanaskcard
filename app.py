@@ -80,13 +80,15 @@ calendar_options = {
         "right": ""
     },
     "initialView": "dayGridMonth",
-    "selectable": True,
-    "initialDate": st.session_state.selected_date,
-    "locale": "ko", 
+    "locale": "ko",
+    
+    # --- 크기 조절 핵심 ---
+    "aspectRatio": 1.4,      # 숫자를 높여서 위아래 폭을 줄임
+    "contentHeight": "auto", # 높이는 내용에 맞게 자동
+    "handleWindowResize": True,
+    
+    # 날짜 숫자 크기가 너무 크면 줄여서 더 작게 보이게 할 수도 있습니다.
     "dayHeaderFormat": {"weekday": "narrow"}, 
-    "contentHeight": "auto", 
-    "aspectRatio": 1.1, 
-    "expandRows": True,
 }
 
 # 3. 달력 그리기 (딱 한 번만 실행!)
