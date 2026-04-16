@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, date
 import os
 import json
 
-password = st.sidebar.text_input("비밀번호를 입력하세요", type="password")
+password = st.sidebar.text_input("비밀번호를 입력하세요 (힌트:결혼기념일, mmdd)", type="password")
 if password != "0224": # 여기에 사용할 암호를 적으세요
     st.info("비밀번호를 입력해야 내역을 볼 수 있습니다.")
     st.stop() # 아래 코드를 실행하지 않음
